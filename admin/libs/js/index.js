@@ -1,26 +1,23 @@
 $(function(){
+
   //获取用户信息
   $.ajax({
     url: 'http://localhost:8080/api/v1/admin/user/info',
-    headers:{
-      'Authorization' : localStorage.getItem('token')
-    },
     success(res){
       if(res.code === 200){
         $('.user_info>img').attr('src',res.data.userPic)
         $('.user_info>span').html('欢迎&nbsp;&nbsp;'+res.data.nickname)
         $('.user_center_link>img').attr('src',res.data.userPic)
       }
-    },
-    error(res){
-      location.href = '/admin/login.html'
     }
+    
   })
 
 
   //文章管理下拉
   var $article = $('#article');
   var $article_list = $('.menu .level02');
+  var $level02 = $('.level02 .level');
 
   $article.click(function () { 
     if($article_list.css('display') == 'none'){
@@ -30,6 +27,10 @@ $(function(){
     }
     
     $article_list.slideToggle();
+  })
+
+  $level02.click(function(){
+    $(this).addClass('active').siblings().removeClass('active')
   })
 
 
