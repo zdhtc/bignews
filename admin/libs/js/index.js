@@ -2,7 +2,7 @@ $(function(){
 
   //获取用户信息
   $.ajax({
-    url: 'http://localhost:8080/api/v1/admin/user/info',
+    url: Bignew.user_info,
     success(res){
       if(res.code === 200){
         $('.user_info>img').attr('src',res.data.userPic)
@@ -43,5 +43,7 @@ $(function(){
       $article.children('.iconfont').css('transform','rotate(90deg)');
     }
   })
+
+
 
 })
