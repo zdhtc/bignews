@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/iconfont.css">
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="./libs/nprogress/nprogress.css">
+    <script src="./libs/nprogress/nprogress.js"></script>
     <script src="./libs/jquery-1.12.4.min.js"></script>
     <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
     <!-- 引入模板引擎js文件 -->
@@ -97,6 +99,13 @@
 
     <script>
         $(function () {
+
+            //注册进度条事件
+            $(document).ajaxStart(function(){
+              window.top.NProgress.start()
+            }).ajaxStop(function(){
+                window.top.NProgress.done()
+            })
 
             // 获取分类列表
             function getCatList() {

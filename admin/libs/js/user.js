@@ -1,5 +1,12 @@
 $(function () {
 
+  //注册进度条事件
+  $(document).ajaxStart(function(){
+    window.top.NProgress.start()
+  }).ajaxStop(function(){
+      window.top.NProgress.done()
+  })
+
   //请求个人用户信息详情
   $.ajax({
     url: Bignew.user_detail,
