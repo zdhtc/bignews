@@ -89,7 +89,7 @@
                 <td>{{ $value.slug }}</td>
                 <td class="text-center">
                     <a href="javascript:void(0);" data-toggle="modal" class=" btn btn-info btn-xs">编辑</a>
-                    <a href="javascript:void(0);" class="btn btn-danger btn-xs">删除</a>
+                    <a href="javascript:void(0);" class="btn btn-danger btn-xs btn-delete" data-id="{{ $value.id }}" >删除</a>
                 </td>
             </tr>
         {{ /each }}
@@ -104,52 +104,83 @@
                     url: Bignew.category_list,
                     dataType: 'json',
                     success(res) {
-                       var html =  template('temp', res);
-                       $('tbody').html(html)
+                        var html = template('temp', res);
+                        $('tbody').html(html)
                     }
                 })
             }
 
             getCatList();
 
+            //为模态框添加隐藏之后的事件，清空其中的输入框
+            $('#myModal').on('hidden.bs.modal',function(){
+                $('.my-input').each(function(i,item){
+                    $(item).val('');
+                })
+            })
+
             // 新增分类功能
-            $('#add').click(function (e) {
-                e.preventDefault();
+            $('.btn-add').click(function () {
+                var flag = true;
+                //判断输入框的值为空时
+                $('.my-input').each(function (i, item) {
+                    if ($(item).val().trim().length == 0) {
+                        flag = false;
+                        $(item).popover('show');
+                        setTimeout(() => {
+                            $(item).popover('hide');
+                        }, 2000)
 
-                $('.btn-add').click(function () {
-                    var flag = true;
-                    // 判断输入框的值为空时
-                    $('.my-input').each(function (i, item) {
-                        if ($(item).val().trim().length == 0) {
-                            flag = false;
-                            console.log(item);
-                            $(item).popover('show');
-                            setTimeout(() => {
-                                $(item).popover('hide');
-                            }, 2000)
-
-                        }
-                    })
-
-                    if (flag) {
-                        // 添加的数据不为空  执行添加操作
-                        $.ajax({
-                            type: 'post',
-                            url: Bignew.category_add,
-                            data: {
-                                name: $('.my-input').eq(0).val().trim(),
-                                slug: $('.my-input').eq(1).val().trim()
-                            },
-                            dataType: 'json',
-                            success(res) {
-
-                            }
-                        })
                     }
-
                 })
 
+                if (flag) {
+                    // 添加的数据不为空  执行添加操作
+
+                    //隐藏模态框
+                    $('#myModal').modal('hide');
+                    //发动post请求
+                    $.ajax({
+                        type: 'post',
+                        url: Bignew.category_add,
+                        data: {
+                            name: $('.my-input').eq(0).val().trim(),
+                            slug: $('.my-input').eq(1).val().trim()
+                        },
+                        dataType: 'json',
+                        success(res) {
+                            if (res.code === 201) {
+                                getCatList();
+                            } else {
+                                alert('添加失败，请稍后重试!');
+                            }
+                        }
+                    })
+                }
+
             })
+
+
+            //删除功能
+            $('tbody').on('click', '.btn-delete', function () {
+                var id = $(this).data('id');
+                var that = $(this).parents('tr');
+                $.ajax({
+                    type: 'post',
+                    url: Bignew.category_delete,
+                    data: {
+                        id: parseInt(id)
+                    },
+                    success(res) {
+                        if (res.code === 204) {
+                            that.remove();
+                        } else {
+                            alert('删除错误，请稍后重试!')
+                        }
+                    }
+                })
+            })
+
         })
     </script>
 
