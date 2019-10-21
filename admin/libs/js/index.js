@@ -45,5 +45,10 @@ $(function(){
   })
 
 
+  //退出功能
+  $('.logout').click(function(){
+    localStorage.removeItem('token');
+    location.href = '/admin/login.html'
+  })
 
 })
