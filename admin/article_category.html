@@ -42,7 +42,7 @@
                 <tfoot>
                     <tr>
                         <td colspan="3" class="text-center">
-                            <a href="javascript:;" class="btn btn-success" id="add" data-toggle="modal"
+                            <a href="javascript:;" class="btn btn-success add" id="" data-toggle="modal"
                                 data-target="#myModal">新增分类</a>
                         </td>
                     </tr>
@@ -76,7 +76,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary btn-add">新增</button>
+                    <button type="button" class="btn btn-primary btn-add" id="operate">新增</button>
                 </div>
             </div>
         </div>
@@ -88,8 +88,8 @@
                 <td>{{ $value.name }}</td>
                 <td>{{ $value.slug }}</td>
                 <td class="text-center">
-                    <a href="javascript:void(0);" data-toggle="modal" class=" btn btn-info btn-xs">编辑</a>
-                    <a href="javascript:void(0);" class="btn btn-danger btn-xs btn-delete" data-id="{{ $value.id }}" >删除</a>
+                    <a href="javascript:;" data-toggle="modal" data-target="#myModal" class="btn btn-info btn-xs edit" data-id="{{ $value.id }}">编辑</a>
+                    <a href="javascript:;" class="btn btn-danger btn-xs btn-delete" data-id="{{ $value.id }}" >删除</a>
                 </td>
             </tr>
         {{ /each }}
@@ -112,17 +112,9 @@
 
             getCatList();
 
-            //为模态框添加隐藏之后的事件，清空其中的输入框
-            $('#myModal').on('hidden.bs.modal',function(){
-                $('.my-input').each(function(i,item){
-                    $(item).val('');
-                })
-            })
-
-            // 新增分类功能
-            $('.btn-add').click(function () {
+            //输入框的值为空时进行的操作
+            function isEmpty() {
                 var flag = true;
-                //判断输入框的值为空时
                 $('.my-input').each(function (i, item) {
                     if ($(item).val().trim().length == 0) {
                         flag = false;
@@ -133,32 +125,87 @@
 
                     }
                 })
+                return flag;
+            }
+
+            //为模态框添加隐藏之后的事件，清空其中的输入框
+            //为模态框添加显示之前的事件，修改其中的文本
+            $('#myModal').on('hidden.bs.modal', function () {
+                $('.my-input').each(function (i, item) {
+                    $(item).val('');
+                })
+            }).on('show.bs.modal', function (e) {
+                if ($(e.relatedTarget).hasClass('edit')) {
+                    $('#myModalLabel').text('编辑分类');
+                    $('#operate').text('编辑').addClass('btn-edit').removeClass('btn-add').data('id', $(e.relatedTarget).data('id'))
+                    $('#name').val($(e.relatedTarget).parents('tr').children().eq(0).text());
+                    $('#slug').val($(e.relatedTarget).parents('tr').children().eq(1).text());
+                } else {
+                    $('#myModalLabel').text('新增分类');
+                    $('#operate').text('新增').addClass('btn-add').removeClass('btn-edit')
+                }
+            })
+
+
+
+            // 新增分类功能
+            // 编辑分类功能
+            $('.btn-add').click(function () {
+                var flag;
+                var id = $(this).data('id');
+                //判断输入框的值为空时
+                flag = isEmpty();
 
                 if (flag) {
                     // 添加的数据不为空  执行添加操作
-
                     //隐藏模态框
                     $('#myModal').modal('hide');
-                    //发动post请求
-                    $.ajax({
-                        type: 'post',
-                        url: Bignew.category_add,
-                        data: {
-                            name: $('.my-input').eq(0).val().trim(),
-                            slug: $('.my-input').eq(1).val().trim()
-                        },
-                        dataType: 'json',
-                        success(res) {
-                            if (res.code === 201) {
-                                getCatList();
-                            } else {
-                                alert('添加失败，请稍后重试!');
+                    //当为添加按钮时，执行添加操作
+                    if ($(this).hasClass('btn-add')) {
+                        //发动添加post请求
+                        $.ajax({
+                            type: 'post',
+                            url: Bignew.category_add,
+                            data: {
+                                name: $('#name').val().trim(),
+                                slug: $('#slug').val().trim()
+                            },
+                            dataType: 'json',
+                            success(res) {
+                                if (res.code === 201) {
+                                    getCatList();
+                                } else {
+                                    alert('添加失败，请稍后重试!');
+                                }
                             }
-                        }
-                    })
+                        })
+                    }else{
+                        
+                        //发动编辑post请求
+                        $.ajax({
+                            type: 'post',
+                            url: Bignew.category_edit,
+                            data: {
+                                id: parseInt(id),
+                                name: $('#name').val().trim(),
+                                slug: $('#slug').val().trim()
+                            },
+                            success(res) {
+                                if(res.code === 200){
+                                    getCatList();
+                                }else{
+                                    alert('编辑失败，请稍后重试!')
+                                }
+                            }
+                        })
+                    }
+
                 }
 
             })
+
+          
+
 
 
             //删除功能
