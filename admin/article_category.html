@@ -64,6 +64,7 @@
                 </div>
 
                 <div class="modal-body">
+                    <input type="hidden" name="id" value="" id="id">
                     <div class="form-group">
                         <label for="name">分类名称</label>
                         <input type="text" class="form-control my-input" id="name" data-toggle="popover"
@@ -84,13 +85,13 @@
         </div>
     </div>
 
-    <script type="text/x-arttemplate" id="temp">
+    <script type="text/html" id="temp">
         {{ each  data}}
             <tr>
                 <td>{{ $value.name }}</td>
                 <td>{{ $value.slug }}</td>
                 <td class="text-center">
-                    <a href="javascript:;" data-toggle="modal" data-target="#myModal" class="btn btn-info btn-xs edit" data-id="{{ $value.id }}">编辑</a>
+                    <a href="javascript:;"  class="btn btn-info btn-xs edit" data-id="{{ $value.id }}">编辑</a>
                     <a href="javascript:;" class="btn btn-danger btn-xs btn-delete" data-id="{{ $value.id }}" >删除</a>
                 </td>
             </tr>
@@ -144,14 +145,14 @@
                     $(item).val('');
                 })
             }).on('show.bs.modal', function (e) {
-                if ($(e.relatedTarget).hasClass('edit')) {
-                    $('#myModalLabel').text('编辑分类');
-                    $('#operate').text('编辑').addClass('btn-edit').removeClass('btn-add').data('id', $(e.relatedTarget).data('id'))
-                    $('#name').val($(e.relatedTarget).parents('tr').children().eq(0).text());
-                    $('#slug').val($(e.relatedTarget).parents('tr').children().eq(1).text());
-                } else {
+                if ($(e.relatedTarget).hasClass('add')) {
                     $('#myModalLabel').text('新增分类');
                     $('#operate').text('新增').addClass('btn-add').removeClass('btn-edit')
+                    
+                } else {
+                    $('#myModalLabel').text('编辑分类');
+                    $('#operate').text('编辑').addClass('btn-edit').removeClass('btn-add')
+                    
                 }
             })
 
@@ -161,7 +162,7 @@
             // 编辑分类功能
             $('.btn-add').click(function () {
                 var flag;
-                var id = $(this).data('id');
+                var id = $("#id").val();
                 //判断输入框的值为空时
                 flag = isEmpty();
 
@@ -195,7 +196,7 @@
                             type: 'post',
                             url: Bignew.category_edit,
                             data: {
-                                id: parseInt(id),
+                                id: id,
                                 name: $('#name').val().trim(),
                                 slug: $('#slug').val().trim()
                             },
@@ -213,10 +214,8 @@
 
             })
 
-          
-
-
-
+            
+            //点击编辑按钮时，请求某条数据
             //删除功能
             $('tbody').on('click', '.btn-delete', function () {
                 var id = $(this).data('id');
@@ -233,6 +232,22 @@
                         } else {
                             alert('删除错误，请稍后重试!')
                         }
+                    }
+                })
+            })
+            .on('click','.edit',function(){
+                var id = $(this).data('id')
+
+                $.ajax({
+                    url: Bignew.category_search,
+                    data: {
+                        id : id
+                    },
+                    success(res){
+                        $('#id').val(res.data[0].id);
+                        $('#name').val(res.data[0].name);
+                        $('#slug').val(res.data[0].slug);
+                        $('#myModal').modal('show')
                     }
                 })
             })
