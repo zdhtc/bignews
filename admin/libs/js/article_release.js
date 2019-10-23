@@ -1,5 +1,7 @@
 $(function ($) {
 
+  
+
   //注册进度条事件
   $(document).ajaxStart(function () {
     window.top.NProgress.start()
@@ -52,8 +54,8 @@ $(function ($) {
       success(res) {
         if (res.code === 200) {
           alert('添加成功')
-          // $('.level02>li:eq(0)', window.parent.document).trigger('click')
-          // window.history.back()
+          $('.level02>li:eq(0)', window.parent.document).trigger('click')
+          
 
           window.location.href = "/admin/article_list.html"
         } else {
