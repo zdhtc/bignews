@@ -79,7 +79,10 @@ $(function () {
     })
   })
 
-  
+  // // 删除功能
+  // $('tbody').on('click','.delete',function(){
+
+  // })
 
 })
 
